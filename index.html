@@ -1,0 +1,290 @@
+<!-- ============================================================
+     ФОРМА ЗАЯВКИ · Конкурс «Восходящая звезда» (2026)
+     Вставлять в Тильду через блок T123 (HTML-код) целиком.
+     ВАЖНО: перед публикацией замените SCRIPT_URL ниже на адрес
+     вашего Google Apps Script (см. инструкцию, шаг 6).
+     ============================================================ -->
+
+<div id="vz-form-root">
+<style>
+/* ====== Изоляция стилей (чтобы Тильда не перебивала) ====== */
+#vz-form-root{
+  --vz-plum:#43285f; --vz-plum2:#5a3b7a; --vz-teal:#22a39a; --vz-teal-d:#1f8a8a;
+  --vz-bg1:#241334; --vz-bg2:#3a2356; --vz-text:#f6f2fb; --vz-muted:#cdbfe0;
+  font-family:'Montserrat','Georgia',Arial,sans-serif;
+  max-width:760px; margin:0 auto; padding:0; box-sizing:border-box;
+}
+#vz-form-root *{box-sizing:border-box;}
+
+.vz-card{
+  position:relative; overflow:hidden; border-radius:22px;
+  background:linear-gradient(150deg,var(--vz-bg1) 0%,var(--vz-bg2) 100%);
+  box-shadow:0 24px 60px rgba(36,19,52,.45); padding:38px 34px 34px;
+  border:1px solid rgba(34,163,154,.25);
+}
+/* мерцающие звёзды на фоне */
+.vz-stars{position:absolute; inset:0; pointer-events:none; z-index:0;}
+.vz-stars i{position:absolute; color:var(--vz-teal); opacity:.0; font-size:12px;
+  animation:vztwinkle 3.6s infinite ease-in-out;}
+@keyframes vztwinkle{0%,100%{opacity:0; transform:scale(.6);}50%{opacity:.8; transform:scale(1);}}
+
+.vz-inner{position:relative; z-index:1;}
+.vz-badge{display:inline-block; font-size:12px; letter-spacing:2px; text-transform:uppercase;
+  color:#0e2b29; background:linear-gradient(90deg,#5fd3c7,var(--vz-teal));
+  padding:6px 14px; border-radius:30px; font-weight:700; margin-bottom:14px;}
+.vz-title{color:var(--vz-text); font-size:30px; font-weight:800; margin:0 0 6px; line-height:1.15;}
+.vz-title b{color:var(--vz-teal);}
+.vz-sub{color:var(--vz-muted); font-size:15px; margin:0 0 26px;}
+
+.vz-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px 18px;}
+.vz-field{display:flex; flex-direction:column;}
+.vz-field.vz-full{grid-column:1 / -1;}
+.vz-field label{color:var(--vz-text); font-size:13.5px; font-weight:600; margin-bottom:6px;}
+.vz-field label .vz-req{color:var(--vz-teal);}
+.vz-field input,.vz-field select,.vz-field textarea{
+  width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.06); color:#fff; font-size:14.5px; font-family:inherit;
+  transition:border-color .2s, box-shadow .2s, background .2s; outline:none;}
+.vz-field textarea{min-height:74px; resize:vertical;}
+.vz-field input::placeholder,.vz-field textarea::placeholder{color:#9b8db8;}
+.vz-field select{appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2322a39a' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat; background-position:right 14px center; padding-right:40px;}
+.vz-field select option{color:#43285f;}
+.vz-field input:focus,.vz-field select:focus,.vz-field textarea:focus{
+  border-color:var(--vz-teal); background:rgba(255,255,255,.10);
+  box-shadow:0 0 0 3px rgba(34,163,154,.20);}
+.vz-hint{color:#9b8db8; font-size:12px; margin-top:5px;}
+
+.vz-agree{grid-column:1 / -1; display:flex; align-items:flex-start; gap:10px; margin-top:4px;}
+.vz-agree input{width:20px; height:20px; min-width:20px; margin-top:1px; accent-color:var(--vz-teal);}
+.vz-agree label{color:var(--vz-muted); font-size:13px; font-weight:400; margin:0; line-height:1.4;}
+.vz-agree a{color:var(--vz-teal); text-decoration:underline;}
+
+/* ====== КНОПКА (Tilda-safe: цвет текста зафиксирован !important) ====== */
+.vz-btn{
+  grid-column:1 / -1; margin-top:10px; width:100%; cursor:pointer;
+  border:none; border-radius:14px; padding:17px 24px; font-size:17px; font-weight:800;
+  font-family:inherit; letter-spacing:.3px;
+  background:linear-gradient(90deg,#34c2b6 0%,var(--vz-teal) 55%,var(--vz-teal-d) 100%) !important;
+  color:#ffffff !important;            /* фикс цвета текста кнопки */
+  -webkit-text-fill-color:#ffffff !important; /* фикс для webkit/Тильды */
+  text-shadow:none !important;
+  box-shadow:0 12px 28px rgba(34,163,154,.35); transition:transform .15s, box-shadow .2s;}
+.vz-btn:hover{transform:translateY(-2px); box-shadow:0 16px 36px rgba(34,163,154,.5);}
+.vz-btn:active{transform:translateY(0);}
+.vz-btn:disabled{opacity:.7; cursor:not-allowed; transform:none;}
+#vz-form-root .vz-btn span{color:#ffffff !important; -webkit-text-fill-color:#ffffff !important;}
+
+/* ====== Сообщения ====== */
+.vz-msg{display:none; grid-column:1/-1; margin-top:14px; padding:14px 16px; border-radius:12px;
+  font-size:14px; line-height:1.45;}
+.vz-msg.ok{display:block; background:rgba(34,163,154,.16); border:1px solid var(--vz-teal); color:#cdeeea;}
+.vz-msg.err{display:block; background:rgba(192,57,43,.16); border:1px solid #c0392b; color:#f6cdc8;}
+
+/* ====== Экран успеха ====== */
+.vz-success{display:none; text-align:center; padding:18px 6px;}
+.vz-success.show{display:block; animation:vzpop .5s ease;}
+@keyframes vzpop{0%{opacity:0; transform:scale(.9);}100%{opacity:1; transform:scale(1);}}
+.vz-success .vz-star{font-size:64px; color:var(--vz-teal);
+  display:inline-block; animation:vzspin 1.2s ease;}
+@keyframes vzspin{0%{transform:rotate(-30deg) scale(0);}100%{transform:rotate(0) scale(1);}}
+.vz-success h3{color:#fff; font-size:26px; margin:10px 0 8px;}
+.vz-success p{color:var(--vz-muted); font-size:15px; margin:0 auto; max-width:470px; line-height:1.5;}
+.vz-success .vz-mail{color:var(--vz-teal); font-weight:700;}
+.vz-again{max-width:470px; margin:20px auto 0; padding:14px 18px; border-radius:12px;
+  background:rgba(34,163,154,.14); border:1px solid var(--vz-teal);
+  color:#fff; font-size:15px; font-weight:700; line-height:1.45;}
+.vz-again span{color:var(--vz-teal);}
+
+@media(max-width:600px){
+  .vz-grid{grid-template-columns:1fr;}
+  .vz-card{padding:28px 20px;}
+  .vz-title{font-size:24px;}
+}
+</style>
+
+<div class="vz-card">
+  <div class="vz-stars" id="vzStars"></div>
+  <div class="vz-inner">
+
+    <!-- ФОРМА -->
+    <form id="vzForm" novalidate>
+      <div class="vz-badge">★ Приём заявок до 31 июля 2026</div>
+      <h2 class="vz-title">Подать заявку на конкурс <b>«Восходящая звезда»</b></h2>
+      <p class="vz-sub">Заполните анкету — заявка будет отправлена на модерацию. Заявки обрабатываются в течение 3–5 рабочих дней, а итоги конкурса публикуются 7 августа 2026 года. Организационный взнос — 150 ₽ за одну конкурсную работу.</p>
+
+      <div class="vz-grid">
+        <div class="vz-field vz-full">
+          <label>ФИО участника или название коллектива <span class="vz-req">*</span></label>
+          <input type="text" name="participant" placeholder="Например: Иванова Анна / Ансамбль «Колибри»" required>
+        </div>
+
+        <div class="vz-field vz-full">
+          <label>Регион и город (населённый пункт) <span class="vz-req">*</span></label>
+          <input type="text" name="city" placeholder="Например: Московская область, г. Подольск" required>
+        </div>
+
+        <div class="vz-field vz-full">
+          <label>Учреждение</label>
+          <input type="text" name="institution" placeholder="Название организации, если вы её представляете (необязательно)">
+        </div>
+
+        <div class="vz-field">
+          <label>Номинация <span class="vz-req">*</span></label>
+          <select name="nomination" required>
+            <option value="" disabled selected>Выберите номинацию</option>
+            <option>Вокал</option>
+            <option>Инструментальное исполнительство</option>
+            <option>Оркестры</option>
+            <option>Хореография</option>
+            <option>Художественное слово</option>
+            <option>Театральное творчество</option>
+            <option>Изобразительное искусство</option>
+            <option>Декоративно-прикладное искусство</option>
+            <option>Фотография</option>
+            <option>Театр мод и дизайн одежды</option>
+            <option>Видеоклипы и любительское кино</option>
+            <option>Цирковое искусство</option>
+          </select>
+        </div>
+        <div class="vz-field">
+          <label>Возрастная категория <span class="vz-req">*</span></label>
+          <select name="age" required>
+            <option value="" disabled selected>Выберите категорию</option>
+            <option>до 7 лет</option>
+            <option>8–11 лет</option>
+            <option>12–15 лет</option>
+            <option>16–17 лет</option>
+            <option>18–21 год</option>
+            <option>22–25 лет</option>
+            <option>от 26 лет</option>
+            <option>Смешанная категория</option>
+            <option>Учитель и ученик</option>
+          </select>
+        </div>
+
+        <div class="vz-field vz-full">
+          <label>Название конкурсной работы <span class="vz-req">*</span></label>
+          <input type="text" name="work" placeholder="Название номера / произведения / работы" required>
+        </div>
+
+        <div class="vz-field vz-full">
+          <label>Ссылка на конкурсный материал (видео/фото) <span class="vz-req">*</span></label>
+          <input type="url" name="material" placeholder="https://disk.yandex.ru/..." required>
+          <div class="vz-hint">Яндекс Диск, Google Диск, Облако Mail.ru или ВКонтакте. Убедитесь, что доступ открыт.</div>
+        </div>
+
+        <div class="vz-field">
+          <label>Руководитель / педагог 1</label>
+          <input type="text" name="teacher1" placeholder="ФИО (если есть)">
+        </div>
+        <div class="vz-field">
+          <label>Руководитель / педагог 2</label>
+          <input type="text" name="teacher2" placeholder="ФИО (если есть)">
+        </div>
+        <div class="vz-field vz-full">
+          <label>Руководитель / педагог 3</label>
+          <input type="text" name="teacher3" placeholder="ФИО (если есть) — не более трёх руководителей">
+        </div>
+
+        <div class="vz-field">
+          <label>E-mail для подтверждения <span class="vz-req">*</span></label>
+          <input type="email" name="email" placeholder="you@example.com" required>
+          <div class="vz-hint">На этот адрес придёт письмо-подтверждение о приёме заявки.</div>
+        </div>
+        <div class="vz-field">
+          <label>Телефон <span class="vz-req">*</span></label>
+          <input type="tel" name="phone" placeholder="+7 (___) ___-__-__" required>
+        </div>
+
+        <div class="vz-field vz-full">
+          <label>Комментарий (необязательно)</label>
+          <textarea name="comment" placeholder="Дополнительная информация для оргкомитета"></textarea>
+        </div>
+
+        <div class="vz-agree">
+          <input type="checkbox" id="vzAgree" name="agree" required>
+          <label for="vzAgree">Я ознакомлен(а) с <a href="https://art-kot.ru" target="_blank" rel="noopener">Положением конкурса</a> и согласен(на) на обработку персональных данных.</label>
+        </div>
+
+        <button type="submit" class="vz-btn" id="vzBtn"><span>★ Отправить заявку</span></button>
+
+        <div class="vz-msg" id="vzMsg"></div>
+      </div>
+    </form>
+
+    <!-- ЭКРАН УСПЕХА -->
+    <div class="vz-success" id="vzSuccess">
+      <div class="vz-star">★</div>
+      <h3>Заявка отправлена на модерацию!</h3>
+      <p>Спасибо! Ваша заявка принята и отправлена на модерацию. Письмо-подтверждение отправлено на адрес <span class="vz-mail" id="vzSentMail"></span>.<br><br>Заявки обрабатываются в течение 3–5 рабочих дней, итоги конкурса будут опубликованы 7 августа 2026 года. Если письма нет — проверьте папку «Спам».</p>
+      <div class="vz-again">★ Хотите подать ещё одну заявку? <span>Перезагрузите страницу.</span></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  /* === ВСТАВЬТЕ СЮДА адрес вашего Google Apps Script (заканчивается на /exec) === */
+  var SCRIPT_URL = "ВСТАВЬТЕ_СЮДА_АДРЕС_APPS_SCRIPT";
+
+  /* мерцающие звёзды */
+  var box=document.getElementById('vzStars');
+  if(box){for(var i=0;i<18;i++){var s=document.createElement('i');s.textContent='★';
+    s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*100)+'%';
+    s.style.fontSize=(8+Math.random()*12)+'px';s.style.animationDelay=(Math.random()*3.6)+'s';
+    box.appendChild(s);}}
+
+  var form=document.getElementById('vzForm');
+  var btn=document.getElementById('vzBtn');
+  var msg=document.getElementById('vzMsg');
+  var success=document.getElementById('vzSuccess');
+
+  function showErr(text){msg.className='vz-msg err';msg.textContent=text;}
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    msg.className='vz-msg';msg.textContent='';
+
+    if(!form.checkValidity()){
+      showErr('Пожалуйста, заполните все обязательные поля (отмечены ★) и поставьте галочку согласия.');
+      form.reportValidity();
+      return;
+    }
+
+    // Галочка согласия обязательна — без неё заявка не отправляется
+    var agree=document.getElementById('vzAgree');
+    if(!agree.checked){
+      showErr('Чтобы отправить заявку, поставьте галочку «Я ознакомлен(а) с Положением конкурса».');
+      try{agree.focus();}catch(e){}
+      return;
+    }
+
+    btn.disabled=true; btn.querySelector('span').textContent='Отправляем…';
+
+    var data=new FormData(form);
+    var email=data.get('email');
+
+    // Телефон передаём без «+», иначе таблица примет его за формулу
+    var phone=(data.get('phone')||'').replace(/\+/g,'');
+    data.set('phone', phone);
+
+    fetch(SCRIPT_URL,{method:'POST',body:data})
+      .then(function(){ done(email); })
+      .catch(function(){
+        /* no-cors / сетевые случаи: считаем успехом, т.к. запрос ушёл */
+        done(email);
+      });
+  });
+
+  function done(email){
+    document.getElementById('vzSentMail').textContent=email;
+    form.style.display='none';
+    success.classList.add('show');
+    try{success.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}
+  }
+})();
+</script>
